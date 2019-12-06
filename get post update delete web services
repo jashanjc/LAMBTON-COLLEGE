@@ -1,0 +1,158 @@
+const express= require('express');
+const app = express();
+var mongo= require('mongodb');
+app.use(express.json());
+
+//connect to database and show list of collections.
+app.get('/api/jc1',(req,res)=>{
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("salesmongo");
+ 
+  dbo.listCollections().toArray(function(err, result) {
+    if (err) throw err;
+    console.log(result);
+    res.send(result);
+db.close();
+ });
+});
+});
+
+
+//get services to read data from collections.
+app.get('/api/jc/jc2',(req,res)=>{
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+MongoClient.connect(url, function(err, db) {
+if (err) throw err;
+var dbo = db.db("salesmongo");
+dbo.collection("department").find({}).toArray(function(err, result) {
+if (err) throw err;
+console.log(result);
+res.send(result);
+
+db.close();
+ });
+});
+});
+app.get('/api/jc3', (req, res)=>{
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("salesmongo");
+  var query = { deptname: "CSE" };
+  dbo.collection("department").find(query).toArray(function(err, result) {
+    if (err) throw err;
+    console.log(result);
+    db.close();
+  });
+});
+});
+
+app.get('/api/jc4', (req,res)=> {
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+
+MongoClient.connect(url, function(err, db) {
+ if (err) throw err;
+ var dbo = db.db("salesmongo");
+ dbo.collection("department").find({}, { projection: { _id: 0, deptname: 1, address: 0 } }).toArray(function(err, result) {
+if (err) throw err;
+console.log(result);
+res.send(result);
+db.close();
+ });
+});
+});
+
+
+//put services to update collections.
+app.put('/api/jc5', (req, res)=>{
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("salesmongo");
+  var myquery = { deptname: "CSE" };
+  var newvalues = { $set: {dlocation: "TORONTO", deptname: "HealthScience" } };
+  dbo.collection("department").updateOne(myquery, newvalues, function(err, res) {
+    if (err) throw err;
+    console.log(res.result.nModified +" document updated");
+    db.close();
+  });
+});
+});
+app.put('/api/jc6', (req, res)=>{
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("salesmongo");
+  var myquery = { dlocation:"TORONTO" };
+  var newvalues = { $set: {mangname:"ash"} };
+  dbo.collection("department").updateOne(myquery, newvalues, function(err, res) {
+    if (err) throw err;
+    console.log(res.result.nModified +"document updated");
+    db.close();
+  });
+});
+});
+
+//post services to insert data into collections.
+app.post('/api/jc7', (req, res)=>{
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("salesmongo");
+  var myobj = { did:"09",deptname: "ChemicalScience", dlocation:"london", mangname: "sirji" ,};
+  dbo.collection("department").insertOne(myobj, function(err, res) {
+    if (err) throw err;
+    console.log("1 document inserted");
+    db.close();
+  });
+});
+});
+
+//delete service to delete data into collections.
+app.delete('/api/jc8', (req, res)=>{
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+    var dbo = db.db("salesmongo");
+  var myquery = { deptname: 'ChemicalScience' };
+  dbo.collection("department").deleteMany(myquery, function(err, obj) {
+    if (err) throw err;
+    console.log("documents deleted");
+    db.close();
+  });
+});
+});
+app.delete('/api/jc9', (req, res)=>{
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("salesmongo");
+  var myquery = { deptname:"EEE" };
+  var newvalues = { $set: {mangname:"param"} };
+  dbo.collection("department").deleteMany(myquery, newvalues, function(err, res) {
+    if (err) throw err;
+    console.log(res.result.n +" document updated");
+    db.close();
+  });
+});
+});
+
+const port= process.env.PORT||8081;
+app.listen(port,()=>console.log('listening to port ${port}...'));
