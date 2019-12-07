@@ -1,0 +1,30 @@
+app.post('/update',(req,res)=> {
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("salesmongo");
+  var myquery = { "eid": req.body.Eid };
+  var newvalues = { $set: {"jobtype":req.body.jobtype } };
+  dbo.collection("employee").updateOne(myquery, newvalues, function(err, res) {
+    if (err) throw err;
+    console.log("1 document updated");
+    db.close();
+  });
+});
+});
+
+app.post('/delete',(req, res)=> {
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("salesmongo");
+  var myobj = { "eid": req.body.Eid };
+  dbo.collection("employee").deleteOne(myobj, function(err, result) {
+    if (err) throw err;
+    res.send("1 document deleted");
+    console.log("1 document deleted");
+    db.close();
+  });
+});
+});
+
+const port = process.env.PORT || 8081;
+app.listen(port, () => console.log('Listening to port ${port}..'));
