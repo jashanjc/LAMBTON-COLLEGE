@@ -1,0 +1,49 @@
+const express = require('express');
+
+const app = express();
+app.use(express.json());
+var MongoClient = require('mongodb').MongoClient;
+var url = "mongodb://localhost:27017/";
+
+
+
+
+const bodyParser = require('body-parser');
+app.use(express.static('Public'));
+
+app.use(express.static('./enterprise'));
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended:true}));
+
+app.post('/sweety', (req, res)=> {
+console.log("Trying to insert new employee data..");
+console.log("eid: " + req.body.eid)
+res.send("1 document inserted");
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("salesmongo");
+  var myobj = {"eid": req.body.Eid,"ename" :req.body.Ename,"ebranch" :req.body.ebranch,"jobtype":req.body.Jobtype};
+  dbo.collection("employee").insertOne(myobj, function(err, res) {
+    if (err) throw err;
+    console.log("1 document inserted");
+
+    db.close();
+  });
+
+});
+});
+
+
+app.get('/show',(req,res)=> {
+
+MongoClient.connect(url, function(err, db) {
+  if (err) throw err;
+  var dbo = db.db("salesmongo");
+  dbo.collection("employee").find({}).toArray(function(err,result) {
+  if (err) throw err;
+  console.log(result);
+  res.send(result);
+  db.close();
+ });
+});
+});
